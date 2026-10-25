@@ -69,7 +69,7 @@ function harness(sourceRoot = base) {
   const render = () => renderListOverview(plugin, ctx, new Element(), yaml, [], overview);
   const settle = async () => { for (let i = 0; i < 30; i++) await Promise.resolve(); };
   const flush = async () => { const queued = [...timers.values()]; timers.clear(); queued.forEach(fn => fn()); await settle(); };
-  return { overview, render, flush, settle, timers, children, Element, observers, ctx, load, folder, plugin, vaultListeners };
+  return { overview, render, flush, settle, timers, children, Element, observers, ctx, load, folder, plugin, vaultListeners, MutationObserver };
 }
 
 module.exports = { harness, base };

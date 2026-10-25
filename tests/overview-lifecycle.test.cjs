@@ -89,12 +89,15 @@ for (const entry of ['src/main.ts']) {
     const code = ts.transpileModule(`class Processor { ${method.getText(file)} }; Processor`, { compilerOptions: { target: ts.ScriptTarget.ES2021 } }).outputText;
     let ready; let created = 0;
     const Processor = vm.runInNewContext(code, {
-      OverviewBlockLifecycle, FolderOverview: class { constructor() { created++; } },
+      OverviewBlockLifecycle, MutationObserver: h.MutationObserver, FolderOverview: class { constructor() { created++; } },
       FolderOverviewSettings: class {}, parseYaml: () => ({}), Notice: class {}, console,
     });
     const processor = new Processor();
+    processor.editButtonHandlers = new WeakMap();
     processor.settings = {}; processor.app = { workspace: { layoutReady: false, onLayoutReady(fn) { ready = fn; } } };
+    const childrenBefore = h.children.length;
     await processor.handleOverviewBlock('', new h.Element(), h.ctx);
+    assert.equal(h.children.length, childrenBefore + 1, 'processor registers a Markdown lifecycle child');
     h.children.at(-1).unload(); await ready();
     assert.equal(created, 0);
     assert.ok(h.observers.every(observer => !observer.active));
